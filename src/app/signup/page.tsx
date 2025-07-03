@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { toast, Bounce } from "react-toastify";
 import { useRouter } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
 import { useAuth } from "@/context/AuthContext";
@@ -22,6 +23,17 @@ const SignUpPage = () => {
 
 		await signUp(email, password);
 		router.push("/");
+		toast.success("Sign up success", {
+			position: "bottom-right",
+			autoClose: 3000,
+			hideProgressBar: false,
+			closeOnClick: false,
+			pauseOnHover: true,
+			draggable: true,
+			progress: undefined,
+			theme: "dark",
+			transition: Bounce,
+		});
 	};
 
 	return (
