@@ -22,14 +22,17 @@ A web application for posting, searching, and managing job listings with advance
 ```
 /mini-job-board
 ├── src/
-│   ├── app/           # Next.js app directory (routing, pages)
-│   ├── components/    # UI components (JobCard, JobList, AuthForm, etc.)
-│   ├── context/       # React Contexts (JobContext, AuthContext)
-│   ├── entities/      # TypeScript types/entities
-│   ├── services/      # Supabase API abstraction (AuthService, JobService)
-│   ├── supabase/      # Supabase client config
-│   └── utils/         # Utility components (RenderIf, etc.)
-└── public/            # Static assets
+│   ├── app/               # Routing and pages (Next.js App Router)
+│   │   ├── layout.tsx     # Root layout and metadata
+│   │   ├── page.tsx       # Home page
+│   │   └── ...            # Other route files (dashboard, job detail, etc.)
+│   ├── components/        # Reusable UI components (NavBar, JobCard, JobList, AuthForm, etc.)
+│   ├── context/           # React Contexts for global state (JobContext, AuthContext)
+│   ├── entities/          # TypeScript types/entities (JobPost, Country, JobType)
+│   ├── services/          # Supabase API abstraction (AuthService, JobService)
+│   ├── supabase/          # Supabase client config and types
+│   └── utils/             # Utility components (RenderIf, etc.)
+└── public/                # Static assets (images, icons, etc.)
 ```
 
 ---
