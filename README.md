@@ -16,33 +16,6 @@ A web application for posting, searching, and managing job listings with advance
 
 ---
 
-## 🏗️ Architecture Overview
-
-- **Frontend:** Next.js 14 (App Router, SSR/SSG, API routes)
-- **Backend** Supabase (Postgres, Auth)
-- **Deployment:** Vercel
-- **Styling:** Tailwind CSS
-
-### Folder Structure
-
-```
-/mini-job-board
-├── src/
-│   ├── app/               # Routing and pages (Next.js App Router)
-│   │   ├── layout.tsx     # Root layout and metadata
-│   │   ├── page.tsx       # Home page
-│   │   └── ...            # Other route files (dashboard, job detail, etc.)
-│   ├── components/        # Reusable UI components (NavBar, JobCard, JobList, AuthForm, etc.)
-│   ├── context/           # React Contexts for global state (JobContext, AuthContext)
-│   ├── entities/          # TypeScript types/entities (JobPost, Country, JobType)
-│   ├── services/          # Supabase API abstraction (AuthService, JobService)
-│   ├── supabase/          # Supabase client config and types
-│   └── utils/             # Utility components (RenderIf, etc.)
-└── public/                # Static assets (images, icons, etc.)
-```
-
----
-
 ## 🛠️ Local Environment Setup Instructions
 
 1. **Clone the repository:**
@@ -75,16 +48,91 @@ A web application for posting, searching, and managing job listings with advance
 
 ---
 
-## 💡 Approach & Features
+## 📚 Stack Overview
 
-- **SSR/SSG:** All components and data fetching are compatible with Next.js SSR/SSG.
-- **Job CRUD:** Create, read, update, and delete job posts (with dashboard for job owners).
-- **Advanced Filtering:** Real-time filtering by search, country, city, and job type.
-- **Reusable Components:** JobCard, JobList, JobForm, AuthForm, RenderIf, JobTime, etc.
-- **State Management:** Context-based, modular, and easy to extend.
-- **Form Validation:** Robust validation and user feedback in AuthForm and JobForm.
-- **UI/UX:** Consistent, modern, and responsive design with Tailwind CSS.
-- **Service Layer:** All Supabase calls are abstracted in `services/` for maintainability.
+- **Frontend:** Next.js 14 (App Router, SSR/SSG, API routes)
+- **Backend** Supabase (Postgres, Auth)
+- **Deployment:** Vercel
+- **Styling:** Tailwind CSS
+
+## 🏗️ Folder Structure
+
+```
+/mini-job-board
+├── src/
+│   ├── app/               # Routing and pages (Next.js App Router)
+│   │   ├── layout.tsx     # Root layout and metadata
+│   │   ├── page.tsx       # Home page
+│   │   └── ...            # Other route files (dashboard, job detail, etc.)
+│   ├── components/        # Reusable UI components (NavBar, JobCard, JobList, AuthForm, etc.)
+│   ├── context/           # React Contexts for global state (JobContext, AuthContext)
+│   ├── entities/          # TypeScript types/entities (JobPost, Country, JobType)
+│   ├── services/          # Supabase API abstraction (AuthService, JobService)
+│   ├── supabase/          # Supabase client config and types
+│   └── utils/             # Utility components (RenderIf, etc.)
+└── public/                # Static assets (images, icons, etc.)
+```
+
+## 🧾 DB Schema Documentation
+
+![Job Board ERD](https://github.com/user-attachments/assets/9bbe722d-f37d-4e71-ac35-afb2a07b5f68)
+
+---
+
+## 📦 Tables Description
+
+### 📝 `job_posts`
+
+Stores individual job listings.
+
+| Column         | Type          | Description                                 |
+| -------------- | ------------- | ------------------------------------------- |
+| `id`           | `uuid`        | Primary key. Unique ID for the job post.    |
+| `title`        | `text`        | Job title.                                  |
+| `company_name` | `text`        | Name of the hiring company.                 |
+| `description`  | `text`        | Detailed job description.                   |
+| `location`     | `text`        | Location of the job.                        |
+| `job_type_id`  | `uuid`        | FK → `job_types.id`, indicates job type.    |
+| `created_at`   | `timestamptz` | Timestamp of job post creation.             |
+| `updated_at`   | `timestamptz` | Timestamp of last update.                   |
+| `user_id`      | `uuid`        | FK → `auth.users.id`, posted by which user. |
+| `country_id`   | `uuid`        | FK → `countries.id`, country of the job.    |
+
+---
+
+### 🗂️ `job_types`
+
+Defines types of jobs, e.g., Full-Time, Part-Time, Contract.
+
+| Column       | Type          | Description                      |
+| ------------ | ------------- | -------------------------------- |
+| `id`         | `uuid`        | Primary key.                     |
+| `type`       | `text`        | Type of job (e.g., "Full-Time"). |
+| `created_at` | `timestamptz` | Timestamp of type creation.      |
+
+---
+
+### 🌍 `countries`
+
+Stores country information.
+
+| Column       | Type          | Description                      |
+| ------------ | ------------- | -------------------------------- |
+| `id`         | `uuid`        | Primary key.                     |
+| `name`       | `bpchar`      | Name of the country.             |
+| `iso`        | `bpchar`      | ISO 3166-1 alpha-2 country code. |
+| `created_at` | `timestamptz` | Timestamp of entry creation.     |
+| `sort_order` | `int4`        | Optional sort priority/order.    |
+
+---
+
+### 👤 `auth.users`
+
+Handled by Supabase for authentication. Used as a foreign key in `job_posts.user_id`.
+
+| Column | Type   | Description                |
+| ------ | ------ | -------------------------- |
+| `id`   | `uuid` | Primary key for each user. |
 
 ---
 
@@ -114,3 +162,39 @@ For the project codebase if I had more time, I would:
 - **Expand Documentation:** Write more guides and diagrams to help new team members and contributors understand and work on the project easily.
 
 ---
+
+## Project Screenshots
+
+#### 🖥️ Desktop View
+
+![Homepage](https://github.com/user-attachments/assets/be2c876f-ce0e-48e0-bb3a-ebe986029834)
+
+&nbsp;
+
+![Job Detail](https://github.com/user-attachments/assets/fc8ba93a-7ce6-4f7e-8791-b154454c3032)
+
+&nbsp;
+
+![Post Job](https://github.com/user-attachments/assets/66797082-eee0-42a5-98cf-a1eb5a977ecc)
+
+&nbsp;
+
+![Edit Job](https://github.com/user-attachments/assets/3cf7023d-b2bf-4a6a-bb2a-fcbe065aae7b)
+
+&nbsp;
+
+#### 📱 Mobile View
+
+<img src="https://github.com/user-attachments/assets/1772ce27-e88d-4881-9c73-e696dbe9c891" alt="Dashboard Mobile" width="300" />
+
+&nbsp;
+
+<img src="https://github.com/user-attachments/assets/707de785-4e55-4c4e-9b72-b766487e1fc9" alt="Mobile Home" width="300" />
+
+&nbsp;
+
+<img src="https://github.com/user-attachments/assets/b2b51e7c-7282-4d5f-b115-41936a45be22" alt="Mobile Job Detail" width="300" />
+
+&nbsp;
+
+<img src="https://github.com/user-attachments/assets/47f73e7f-f7ed-41e7-955b-085e4c718dfa" alt="Mobile Post Job" width="300" />
