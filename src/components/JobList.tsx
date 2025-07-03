@@ -7,6 +7,8 @@ import { JobPost } from "@/entities/job-post";
 import { useJobs } from "@/context/JobContext";
 import { EditButton, DeleteButton } from "./ActionButtons";
 import { useRouter, usePathname } from "next/navigation";
+import RenderIf from "@/utils/RenderIf";
+
 interface JobListProps {
 	jobs?: JobPost[];
 	onEdit?: (job: JobPost) => void;
@@ -30,10 +32,10 @@ const JobList: React.FC<JobListProps> = ({ jobs, onEdit, onDelete }) => {
 
 	return (
 		<>
-			{data.map((job: JobPost) =>
-				onEdit && onDelete ? (
-					<Link key={job.id} href={`/jobs/${job.id}`} className="block">
-						<JobCard job={job}>
+			{data.map((job: JobPost) => (
+				<Link key={job.id} href={`/jobs/${job.id}`} className="block">
+					<JobCard job={job}>
+						<RenderIf isTrue={!!onEdit && !!onDelete}>
 							<div className="relative z-10 flex gap-2 justify-end mt-2" onClick={e => e.stopPropagation()}>
 								<EditButton
 									onClick={(e: React.MouseEvent) => {
@@ -47,7 +49,7 @@ const JobList: React.FC<JobListProps> = ({ jobs, onEdit, onDelete }) => {
 									onClick={(e: React.MouseEvent) => {
 										e.stopPropagation();
 										e.preventDefault();
-										onDelete(job.id);
+										if (onDelete) onDelete(job.id);
 										toast.warning("Job deleted", {
 											position: "bottom-right",
 											autoClose: 3000,
@@ -63,14 +65,10 @@ const JobList: React.FC<JobListProps> = ({ jobs, onEdit, onDelete }) => {
 									className="font-bold text-base cursor-pointer z-20"
 								/>
 							</div>
-						</JobCard>
-					</Link>
-				) : (
-					<Link key={job.id} href={`/jobs/${job.id}`}>
-						<JobCard job={job} />
-					</Link>
-				)
-			)}
+						</RenderIf>
+					</JobCard>
+				</Link>
+			))}
 		</>
 	);
 };

@@ -1,18 +1,17 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { notFound } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 import { useParams } from "next/navigation";
 import { useJobs } from "@/context/JobContext";
+import JobTime from "@/components/JobTime";
 
 const JobDetailPage = () => {
-	const { user } = useAuth();
 	const { jobList } = useJobs();
 
 	const params = useParams();
 	const id = params.id as string;
 
-	React.useEffect(() => {
+	useEffect(() => {
 		window.scrollTo({ top: 0, behavior: "instant" });
 	}, []);
 
@@ -33,27 +32,7 @@ const JobDetailPage = () => {
 						{job.countries?.name}
 					</div>
 					<p className="text-[#B4B4B4] whitespace-pre-line">{job.description}</p>
-					<div className="text-xs text-gray-400 text-right mt-2">
-						{new Date(job.updated_at).getTime() > new Date(job.created_at).getTime()
-							? `Last Updated: ${new Date(job.updated_at).toLocaleDateString(undefined, {
-									day: "2-digit",
-									month: "short",
-									year: "numeric",
-							  })} - ${new Date(job.updated_at).toLocaleTimeString(undefined, {
-									hour: "2-digit",
-									minute: "2-digit",
-									hour12: false,
-							  })}`
-							: `Created On: ${new Date(job.created_at).toLocaleDateString(undefined, {
-									day: "2-digit",
-									month: "short",
-									year: "numeric",
-							  })} - ${new Date(job.created_at).toLocaleTimeString(undefined, {
-									hour: "2-digit",
-									minute: "2-digit",
-									hour12: false,
-							  })}`}
-					</div>
+					<JobTime createdAt={job.created_at} updatedAt={job.updated_at} />
 				</div>
 			</main>
 		</div>

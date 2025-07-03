@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast, Bounce } from "react-toastify";
 import { useJobs } from "@/context/JobContext";
@@ -13,11 +13,11 @@ const EditJobPage = () => {
 	const params = useParams();
 	const id = params.id as string;
 
-	React.useEffect(() => {
+	useEffect(() => {
 		window.scrollTo({ top: 0, behavior: "instant" });
 	}, []);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (!loading && !user) {
 			router.replace("/signin");
 		}

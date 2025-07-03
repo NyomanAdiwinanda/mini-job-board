@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 
 import JobForm from "@/components/JobForm";
 import { useAuth } from "@/context/AuthContext";
@@ -9,11 +9,11 @@ const PostJobPage = () => {
 	const { user, loading } = useAuth();
 	const router = useRouter();
 
-	React.useEffect(() => {
+	useEffect(() => {
 		window.scrollTo({ top: 0, behavior: "instant" });
 	}, []);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (!loading && !user) {
 			router.replace("/signin");
 		}

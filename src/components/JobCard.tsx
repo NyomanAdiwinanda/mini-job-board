@@ -1,5 +1,6 @@
 import React from "react";
-import type { JobPost } from "@/entities/job-post";
+import { JobPost } from "@/entities/job-post";
+import JobTime from "@/components/JobTime";
 
 interface JobCardProps {
 	job: JobPost;
@@ -20,25 +21,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, children }) => {
 			</div>
 			<p className="text-[#B4B4B4] mt-2 line-clamp-4 h-[96px]">{job.description}</p>
 			<div className="text-xs text-gray-400 text-right mt-2">
-				{new Date(job.updated_at).getTime() > new Date(job.created_at).getTime()
-					? `Last Updated: ${new Date(job.updated_at).toLocaleDateString(undefined, {
-							day: "2-digit",
-							month: "short",
-							year: "numeric",
-					  })} - ${new Date(job.updated_at).toLocaleTimeString(undefined, {
-							hour: "2-digit",
-							minute: "2-digit",
-							hour12: false,
-					  })}`
-					: `Created On: ${new Date(job.created_at).toLocaleDateString(undefined, {
-							day: "2-digit",
-							month: "short",
-							year: "numeric",
-					  })} - ${new Date(job.created_at).toLocaleTimeString(undefined, {
-							hour: "2-digit",
-							minute: "2-digit",
-							hour12: false,
-					  })}`}
+				<JobTime createdAt={job.created_at} updatedAt={job.updated_at} />
 			</div>
 			{children && <div className="flex gap-2 justify-end mt-2">{children}</div>}
 		</div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import JobForm from "@/components/JobForm";
 import { JobPost } from "@/entities/job-post";
 import { useAuth } from "@/context/AuthContext";
@@ -8,6 +8,7 @@ import { useJobs } from "@/context/JobContext";
 import { supabase } from "@/supabase/client";
 import JobList from "@/components/JobList";
 import Loading from "@/components/Loading";
+import RenderIf from "@/utils/RenderIf";
 
 const DashboardPage = () => {
 	const { user, loading } = useAuth();
@@ -16,17 +17,17 @@ const DashboardPage = () => {
 	const [editingJob, setEditingJob] = useState<JobPost | null>(null);
 	const [myJobs, setMyJobs] = useState<JobPost[]>([]);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		window.scrollTo({ top: 0, behavior: "instant" });
 	}, []);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (!loading && !user) {
 			router.replace("/signin");
 		}
 	}, [user, loading, router]);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (user) {
 			fetchUserJobs(user.id).then(setMyJobs);
 		}
@@ -66,13 +67,14 @@ const DashboardPage = () => {
 		<div className="min-h-screen bg-page">
 			<main className="max-w-4xl mx-auto py-10 px-4">
 				<h1 className="text-3xl font-bold mb-6 text-center">My Posted Jobs</h1>
-				{editingJob ? (
-					<JobForm initial={editingJob} onSubmit={handleUpdate} submitLabel="Update Job" />
-				) : (
+				<RenderIf isTrue={!!editingJob}>
+					<JobForm initial={editingJob!} onSubmit={handleUpdate} submitLabel="Update Job" />
+				</RenderIf>
+				<RenderIf isTrue={!editingJob}>
 					<div className="grid gap-6 md:grid-cols-2">
 						<JobList jobs={myJobs} onEdit={handleEdit} onDelete={handleDelete} />
 					</div>
-				)}
+				</RenderIf>
 			</main>
 		</div>
 	);

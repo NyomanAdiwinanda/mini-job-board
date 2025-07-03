@@ -104,7 +104,6 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
 	const updateJob = async (id: string, updatedJob: Partial<JobPost>) => {
 		const { error } = await supabase.from("job_posts").update(updatedJob).eq("id", id);
 		if (error) throw error;
-		// Optionally, refresh jobList after update
 		await fetchAll();
 	};
 

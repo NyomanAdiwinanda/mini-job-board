@@ -96,7 +96,6 @@ const SearchBar = ({}) => {
 				>
 					Search
 				</button>
-				{/* Reset Filters Button */}
 				{countriesFilter[0]?.id &&
 					selectedCountryId &&
 					(search || selectedCountryId !== countriesFilter[0].id || selectedLocation || selectedJobTypeId) && (

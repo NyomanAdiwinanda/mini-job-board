@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import RenderIf from "@/utils/RenderIf";
 
 interface AuthFormProps {
 	type: "signin" | "signup";
@@ -49,10 +50,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
 				value={password}
 				onChange={e => setPassword(e.target.value)}
 			/>
-			{isSignup && password.length > 0 && password.length < 6 && (
+			<RenderIf isTrue={isSignup && password.length > 0 && password.length < 6}>
 				<span className="text-red-500 text-sm -mt-2">6 characters minimum</span>
-			)}
-			{isSignup && (
+			</RenderIf>
+			<RenderIf isTrue={isSignup}>
 				<input
 					type="password"
 					name="confirmPassword"
@@ -62,7 +63,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
 					value={confirmPassword}
 					onChange={e => setConfirmPassword(e.target.value)}
 				/>
-			)}
+			</RenderIf>
 			<button
 				type="submit"
 				disabled={isDisabled}
