@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mini Job Board
 
-## Getting Started
+A web application for posting, searching, and managing job listings with advanced filtering, user authentication, and a responsive dashboard. This project is submitted as part of the assessment for Konexi.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Live Demo
+
+> _Replace this line with your deployed link if available._
+
+---
+
+## 🏗️ Architecture Overview
+
+- **Frontend:** Next.js 14 (App Router, SSR/SSG, API routes)
+- **Backend** Supabase (Postgres, Auth)
+- **Deployment:** Vercel
+- **Styling:** Tailwind CSS
+
+### Folder Structure
+
+```
+/mini-job-board
+├── src/
+│   ├── app/           # Next.js app directory (routing, pages)
+│   ├── components/    # UI components (JobCard, JobList, AuthForm, etc.)
+│   ├── context/       # React Contexts (JobContext, AuthContext)
+│   ├── entities/      # TypeScript types/entities
+│   ├── services/      # Supabase API abstraction (AuthService, JobService)
+│   ├── supabase/      # Supabase client config
+│   └── utils/         # Utility components (RenderIf, etc.)
+└── public/            # Static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Setup Instructions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Clone the repository:**
 
-## Learn More
+   ```bash
+   git clone <your-repo-url>
+   cd mini-job-board
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Install dependencies:**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   npm install
+   # or yarn install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Configure Supabase:**
 
-## Deploy on Vercel
+   - Copy your Supabase project URL and anon key into `src/supabase/client.ts`.
+   - Ensure your Supabase tables: `job_posts`, `countries`, `job_types` are set up as per the entities in `src/entities/`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   # or yarn dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 💡 Approach & Features
+
+- **SSR/SSG:** All components and data fetching are compatible with Next.js SSR/SSG.
+- **Job CRUD:** Create, read, update, and delete job posts (with dashboard for job owners).
+- **Advanced Filtering:** Real-time filtering by search, country, city, and job type.
+- **Reusable Components:** JobCard, JobList, JobForm, AuthForm, RenderIf, JobTime, etc.
+- **State Management:** Context-based, modular, and easy to extend.
+- **Form Validation:** Robust validation and user feedback in AuthForm and JobForm.
+- **UI/UX:** Consistent, modern, and responsive design with Tailwind CSS.
+- **Service Layer:** All Supabase calls are abstracted in `services/` for maintainability.
+
+---
+
+## 🛠️ What I Would Add With More Time
+
+For the features if given more time, I would add new features such as:
+
+- **User Profiles:** Let users create and edit their own professional profiles, including skills, experience, and a profile picture.
+- **Job Applications:** Allow users to apply for jobs directly through the platform and track their application status.
+- **Messaging:** Enable direct messaging between job seekers and employers for faster communication.
+- **Company Pages:** Let companies create dedicated pages to showcase their brand, open positions, and culture.
+- **Recommendations & Endorsements:** Allow users to endorse each other's skills and write recommendations.
+- **Saved Jobs & Job Alerts:** Let users save interesting jobs and set up alerts for new postings matching their interests.
+- **Social Feed:** Add a feed for users to share updates, achievements, or industry news, similar to LinkedIn.
+- **Advanced Search:** Provide more granular search and filtering (e.g., by salary range, remote/hybrid, experience level).
+- **Analytics Dashboard:** Give employers insights into job post views, applications, and candidate demographics.
+- **Mobile App:** Build a companion mobile app for on-the-go access.
+
+For the project codebase if I had more time, I would:
+
+- **Add End-to-End and Integration Tests:** Use tools to automatically check that all features work as expected, reducing bugs and making updates safer.
+- **Add Unit Testing:** Write small, focused tests for individual functions and components to catch issues early and ensure each part works correctly on its own.
+- **Refine Error Handling:** Make sure the app always shows clear, helpful messages if something goes wrong.
+- **Implement Error Monitoring:** Set up systems to catch and alert on errors in real time, so issues can be fixed quickly.
+- **Optimize Performance:** Make the app load faster and run smoother, even with lots of users or data.
+- **Automate CI/CD:** Automate testing and deployment, so new features and fixes can go live faster and more reliably.
+- **Expand Documentation:** Write more guides and diagrams to help new team members and contributors understand and work on the project easily.
+
+---
