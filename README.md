@@ -7,6 +7,12 @@ A web application for posting, searching, and managing job listings with advance
 ## 🚀 Live Demo
 
 > [https://mini-job-board-murex.vercel.app/](https://mini-job-board-murex.vercel.app/)
+>
+> **Demo Login:**
+> Use the following credentials to log in as a demo user and explore all features (posting jobs, dashboard, etc.):
+>
+> - Email: user@mail.com
+> - Password: 123456
 
 ---
 
