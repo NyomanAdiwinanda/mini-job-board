@@ -16,6 +16,9 @@ interface JobContextType {
 	jobTypeFilter: JobType[];
 	jobTypeFilterError: QueryError | null;
 	loading: boolean;
+	fetchUserJobs: (userId: string) => Promise<JobPost[]>;
+	updateJob: (id: string, updatedJob: Partial<JobPost>) => Promise<void>;
+	refreshJobs: () => Promise<void>;
 }
 
 const JobContext = createContext<JobContextType | undefined>(undefined);
@@ -36,12 +39,16 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
 	}, [selectedCountryFilter, selectedJobTypeFilter]);
 
 	const fetchAll = async () => {
+		setLoading(true);
 		const [
 			{ data: jobListData, error: jobListError },
 			{ data: countriesFilterData, error: countryFilterError },
 			{ data: jobTypeFilterData, error: jobTypeFilterError },
 		] = await Promise.all([
-			supabase.from("job_posts").select("*, countries(id, name, iso), job_types(id, type)"),
+			supabase
+				.from("job_posts")
+				.select("*, countries(id, name, iso), job_types(id, type)")
+				.order("updated_at", { ascending: false }),
 			supabase.from("countries").select("*").order("sort_order", { ascending: true }),
 			supabase.from("job_types").select("*").order("created_at", { ascending: true }),
 		]);
@@ -59,6 +66,28 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
 		setLoading(false);
 	};
 
+	const fetchUserJobs = async (userId: string) => {
+		const { data, error } = await supabase
+			.from("job_posts")
+			.select("*, countries(id, name, iso), job_types(id, type)")
+			.eq("user_id", userId)
+			.order("updated_at", { ascending: false });
+		if (error) return [];
+
+		return data || [];
+	};
+
+	const updateJob = async (id: string, updatedJob: Partial<JobPost>) => {
+		const { error } = await supabase.from("job_posts").update(updatedJob).eq("id", id);
+		if (error) throw error;
+		// Optionally, refresh jobList after update
+		await fetchAll();
+	};
+
+	const refreshJobs = async () => {
+		await fetchAll();
+	};
+
 	const value = {
 		jobList,
 		jobListError,
@@ -69,6 +98,9 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
 		jobTypeFilter,
 		jobTypeFilterError,
 		loading,
+		fetchUserJobs,
+		updateJob,
+		refreshJobs,
 	};
 
 	return <JobContext.Provider value={value}>{children}</JobContext.Provider>;

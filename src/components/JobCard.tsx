@@ -3,11 +3,12 @@ import type { JobPost } from "@/entities/job-post";
 
 interface JobCardProps {
 	job: JobPost;
+	children?: React.ReactNode;
 }
 
-const JobCard: React.FC<JobCardProps> = ({ job }) => {
+const JobCard: React.FC<JobCardProps> = ({ job, children }) => {
 	return (
-		<div className="bg-card rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer flex flex-col gap-2 text-card min-h-[220px]">
+		<div className="bg-card rounded-lg shadow-md p-6 hover:shadow-lg transition flex flex-col gap-2 text-card min-h-[220px]">
 			<div className="flex justify-between items-center">
 				<h2 className="text-xl font-bold text-[#FAFAFA]">{job.title}</h2>
 				<span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{job.job_types?.type}</span>
@@ -24,13 +25,22 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
 							day: "2-digit",
 							month: "short",
 							year: "numeric",
+					  })} - ${new Date(job.updated_at).toLocaleTimeString(undefined, {
+							hour: "2-digit",
+							minute: "2-digit",
+							hour12: false,
 					  })}`
 					: `Created On: ${new Date(job.created_at).toLocaleDateString(undefined, {
 							day: "2-digit",
 							month: "short",
 							year: "numeric",
+					  })} - ${new Date(job.created_at).toLocaleTimeString(undefined, {
+							hour: "2-digit",
+							minute: "2-digit",
+							hour12: false,
 					  })}`}
 			</div>
+			{children && <div className="flex gap-2 justify-end mt-2">{children}</div>}
 		</div>
 	);
 };

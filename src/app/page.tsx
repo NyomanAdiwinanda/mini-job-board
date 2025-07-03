@@ -9,8 +9,10 @@ const Home = async () => {
 				<div className="w-full mb-8">
 					<SearchBar />
 				</div>
-				<div className="grid gap-6 md:grid-cols-2">
-					<JobList />
+				<div className="flex min-h-[300px] items-center justify-center">
+					<div className="w-full grid gap-6 md:grid-cols-2">
+						<JobList />
+					</div>
 				</div>
 			</main>
 		</div>

@@ -1,21 +1,57 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { toast, Bounce } from "react-toastify";
 import { Country } from "@/entities/country";
 import { useJobs } from "@/context/JobContext";
 import { supabase } from "@/supabase/client";
+import { JobPost } from "@/entities/job-post";
+import { useRouter } from "next/navigation";
 
-const JobForm: React.FC = () => {
-	const [jobTitle, setJobTitle] = useState<string>("");
-	const [companyName, setCompanyName] = useState<string>("");
-	const [countryId, setCountryId] = useState<string>("");
-	const [location, setLocation] = useState<string>("");
-	const [jobTypeId, setJobTypeId] = useState<string>("");
-	const [description, setDescription] = useState<string>("");
+interface JobFormProps {
+	initial?: Partial<JobPost>;
+	onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+	submitLabel?: string;
+}
+
+const JobForm: React.FC<JobFormProps> = ({ initial = {}, onSubmit, submitLabel = "Post Job" }) => {
+	const [jobTitle, setJobTitle] = useState<string>(initial.title || "");
+	const [companyName, setCompanyName] = useState<string>(initial.company_name || "");
+	const [countryId, setCountryId] = useState<string>(initial.country_id || "");
+	const [location, setLocation] = useState<string>(initial.location || "");
+	const [jobTypeId, setJobTypeId] = useState<string>(initial.job_type_id || "");
+	const [description, setDescription] = useState<string>(initial.description || "");
 
 	const [locationList, setLocationList] = useState<string[]>([]);
 	const [citiesError, setCitiesError] = useState<string>("");
 	const [isLoadingCities, setIsLoadingCities] = useState<boolean>(false);
-	const { countriesFilter, jobTypeFilter } = useJobs();
+	const { countriesFilter, jobTypeFilter, refreshJobs } = useJobs();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (initial.country_id && countriesFilter.length) {
+			const selected = countriesFilter.find(c => c.id === initial.country_id);
+			if (selected && selected.name !== "Remote") {
+				(async () => {
+					setIsLoadingCities(true);
+					try {
+						const res = await fetch("https://countriesnow.space/api/v0.1/countries/cities", {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ country: selected.name.trim() }),
+						});
+						const result = await res.json();
+						if (result.data && Array.isArray(result.data)) {
+							setLocationList(result.data);
+						}
+					} catch {
+						setLocationList([]);
+					} finally {
+						setIsLoadingCities(false);
+					}
+				})();
+			}
+		}
+	}, [initial.country_id, countriesFilter]);
 
 	const onSelectCountry = async (country: Country) => {
 		setLocation("");
@@ -53,6 +89,7 @@ const JobForm: React.FC = () => {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		if (onSubmit) return onSubmit(e);
 		const jobData = {
 			title: jobTitle,
 			company_name: companyName,
@@ -61,11 +98,23 @@ const JobForm: React.FC = () => {
 			country_id: countryId,
 			job_type_id: jobTypeId,
 		};
-
 		const { error } = await supabase.from("job_posts").insert([jobData]).select();
-
 		if (error) {
 			console.error("Error posting job:", error.message);
+		} else {
+			await refreshJobs();
+			router.push("/dashboard");
+			toast.success("Job created", {
+				position: "bottom-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: false,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "dark",
+				transition: Bounce,
+			});
 		}
 	};
 
@@ -82,7 +131,7 @@ const JobForm: React.FC = () => {
 			onSubmit={handleSubmit}
 			className="bg-card p-8 rounded shadow-md w-full max-w-lg mx-auto flex flex-col gap-4 text-card"
 		>
-			<h1 className="text-2xl font-bold text-center mb-4">Post Job</h1>
+			<h1 className="text-2xl font-bold text-center mb-4">{submitLabel}</h1>
 			<input
 				type="text"
 				name="title"
@@ -171,7 +220,7 @@ const JobForm: React.FC = () => {
 				}`}
 				disabled={!isFormValid}
 			>
-				Post Job
+				{submitLabel}
 			</button>
 		</form>
 	);
