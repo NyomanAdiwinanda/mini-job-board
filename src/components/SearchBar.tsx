@@ -2,17 +2,25 @@
 import React, { useState } from "react";
 import { useJobs } from "@/context/JobContext";
 
-const CREATED_AT = [
-	{ value: "newest", label: "Newest" },
-	{ value: "oldest", label: "Oldest" },
-];
-
 const SearchBar = ({}) => {
 	const [search, setSearch] = useState("");
-	const { countriesFilter, jobTypeFilter } = useJobs();
+	const {
+		countriesFilter,
+		jobTypeFilter,
+		setSelectedCountryFilter,
+		setSelectedJobTypeFilter,
+		setSearchFilter,
+		setSelectedLocationFilter,
+	} = useJobs();
+
+	const [selectedCountryId, setSelectedCountryId] = useState<string>("");
+	const [selectedLocation, setSelectedLocation] = useState<string>("");
+	const [locationList, setLocationList] = useState<string[]>([]);
+	const [isLoadingCities, setIsLoadingCities] = useState(false);
+	const [selectedJobTypeId, setSelectedJobTypeId] = useState<string>("");
 
 	const onSearch = () => {
-		alert(`Searching for: ${search}`);
+		setSearchFilter(search);
 	};
 
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,6 +35,49 @@ const SearchBar = ({}) => {
 		}
 	};
 
+	React.useEffect(() => {
+		const selectedCountry = countriesFilter.find(c => c.id === selectedCountryId);
+		const countryName = selectedCountry?.name || "";
+		if (!countryName || countryName === "All" || countryName === "Remote") {
+			setLocationList([]);
+			setSelectedLocation("");
+			setIsLoadingCities(false);
+			return;
+		}
+		setIsLoadingCities(true);
+		fetch("https://countriesnow.space/api/v0.1/countries/cities", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ country: countryName.trim() }),
+		})
+			.then(res => res.json())
+			.then(result => {
+				if (result.error || !result.data || !Array.isArray(result.data) || result.data.length === 0) {
+					setLocationList([]);
+				} else {
+					setLocationList(result.data);
+				}
+			})
+			.catch(() => {
+				setLocationList([]);
+			})
+			.finally(() => setIsLoadingCities(false));
+	}, [selectedCountryId, countriesFilter]);
+
+	React.useEffect(() => {
+		setSelectedLocationFilter("");
+		setSearchFilter("");
+		setSelectedCountryFilter("");
+		setSelectedJobTypeId("");
+		setSelectedJobTypeFilter("");
+	}, [setSelectedLocationFilter, setSearchFilter, setSelectedCountryFilter, setSelectedJobTypeFilter]);
+
+	React.useEffect(() => {
+		if (!selectedCountryId && countriesFilter[0]?.id) {
+			setSelectedCountryId(countriesFilter[0].id);
+		}
+	}, [countriesFilter, selectedCountryId]);
+
 	return (
 		<div className={"w-full flex flex-col mb-8"}>
 			<div className="flex w-full">
@@ -35,7 +86,7 @@ const SearchBar = ({}) => {
 					value={search}
 					onChange={onChange}
 					onKeyDown={handleKeyDown}
-					placeholder="Search jobs..."
+					placeholder="Search jobs or company"
 					className="flex-1 px-4 py-2 rounded-l bg-card text-card border border-[#333] focus:outline-none focus:ring-2 focus:ring-blue-600"
 				/>
 				<button
@@ -45,6 +96,28 @@ const SearchBar = ({}) => {
 				>
 					Search
 				</button>
+				{/* Reset Filters Button */}
+				{countriesFilter[0]?.id &&
+					selectedCountryId &&
+					(search || selectedCountryId !== countriesFilter[0].id || selectedLocation || selectedJobTypeId) && (
+						<button
+							onClick={() => {
+								setSearch("");
+								setSelectedCountryId(countriesFilter[0]?.id || "");
+								setSelectedLocation("");
+								setSelectedLocationFilter("");
+								setSearchFilter("");
+								setSelectedCountryFilter("");
+								setSelectedJobTypeId("");
+								setSelectedJobTypeFilter("");
+							}}
+							className="ml-2 px-4 py-2 rounded bg-gray-600 text-white font-semibold hover:bg-gray-700 transition border border-gray-600"
+							style={{ minWidth: 0 }}
+							type="button"
+						>
+							Reset Filters
+						</button>
+					)}
 			</div>
 			<div className="block md:hidden mt-4">
 				<button
@@ -65,47 +138,92 @@ const SearchBar = ({}) => {
 				</button>
 			</div>
 			<div className={`flex-col md:flex-row gap-4 mt-4 ${showFilters ? "flex" : "hidden"} md:flex`}>
-				<div className="flex flex-col flex-1">
+				<div className="flex flex-col flex-1 min-w-[180px]">
 					<label htmlFor="country" className="mb-1 text-sm text-gray-300">
 						Country
 					</label>
 					<select
 						id="country"
-						className="border rounded px-4 py-2 bg-card text-card focus:outline-none focus:ring-2 focus:ring-blue-600"
+						className="border rounded px-4 py-2 bg-card text-card focus:outline-none focus:ring-2 focus:ring-blue-600 w-full"
+						value={selectedCountryId}
+						onChange={e => {
+							setSelectedCountryId(e.target.value);
+							if (e.target.value === countriesFilter[0].id) {
+								setSelectedCountryFilter("");
+							} else {
+								setSelectedCountryFilter(e.target.value);
+							}
+						}}
 					>
 						{countriesFilter.map(c => (
-							<option key={c.id} value={c.name}>
+							<option key={c.id} value={c.id}>
 								{c.name}
 							</option>
 						))}
 					</select>
 				</div>
-				<div className="flex flex-col flex-1">
+				<div className="flex flex-col flex-1 min-w-[180px]">
+					<label htmlFor="location" className="mb-1 text-sm text-gray-300">
+						Location
+					</label>
+					<select
+						id="location"
+						className={`border rounded px-4 py-2 bg-card text-card focus:outline-none focus:ring-2 focus:ring-blue-600 w-full disabled:bg-gray-800 disabled:text-gray-400 disabled:cursor-not-allowed ${
+							!selectedCountryId ||
+							countriesFilter.find(c => c.id === selectedCountryId)?.name === "All" ||
+							countriesFilter.find(c => c.id === selectedCountryId)?.name === "Remote" ||
+							isLoadingCities ||
+							locationList.length === 0
+								? "opacity-60"
+								: ""
+						}`}
+						value={selectedLocation}
+						onChange={e => {
+							setSelectedLocation(e.target.value);
+							setSelectedLocationFilter(e.target.value);
+						}}
+						disabled={
+							!selectedCountryId ||
+							countriesFilter.find(c => c.id === selectedCountryId)?.name === "All" ||
+							countriesFilter.find(c => c.id === selectedCountryId)?.name === "Remote" ||
+							isLoadingCities ||
+							locationList.length === 0
+						}
+					>
+						<option value="">
+							{isLoadingCities
+								? "Loading..."
+								: locationList.length === 0
+								? "No cities for selected country"
+								: "Select location"}
+						</option>
+						{locationList.map(city => (
+							<option key={city} value={city}>
+								{city}
+							</option>
+						))}
+					</select>
+				</div>
+				<div className="flex flex-col flex-1 min-w-[180px]">
 					<label htmlFor="jobType" className="mb-1 text-sm text-gray-300">
 						Job Type
 					</label>
 					<select
 						id="jobType"
-						className="border rounded px-4 py-2 bg-card text-card focus:outline-none focus:ring-2 focus:ring-blue-600"
+						className="border rounded px-4 py-2 bg-card text-card focus:outline-none focus:ring-2 focus:ring-blue-600 w-full"
+						value={selectedJobTypeId}
+						onChange={e => {
+							setSelectedJobTypeId(e.target.value);
+							if (e.target.value === jobTypeFilter[0].id) {
+								setSelectedJobTypeFilter("");
+							} else {
+								setSelectedJobTypeFilter(e.target.value);
+							}
+						}}
 					>
 						{jobTypeFilter.map(j => (
-							<option key={j.id} value={j.type}>
+							<option key={j.id} value={j.id}>
 								{j.type}
-							</option>
-						))}
-					</select>
-				</div>
-				<div className="flex flex-col flex-1">
-					<label htmlFor="createdAt" className="mb-1 text-sm text-gray-300">
-						Created At
-					</label>
-					<select
-						id="createdAt"
-						className="border rounded px-4 py-2 bg-card text-card focus:outline-none focus:ring-2 focus:ring-blue-600"
-					>
-						{CREATED_AT.map(opt => (
-							<option key={opt.value} value={opt.value}>
-								{opt.label}
 							</option>
 						))}
 					</select>

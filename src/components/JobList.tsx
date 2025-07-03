@@ -6,9 +6,7 @@ import JobCard from "./JobCard";
 import { JobPost } from "@/entities/job-post";
 import { useJobs } from "@/context/JobContext";
 import { EditButton, DeleteButton } from "./ActionButtons";
-import { useRouter } from "next/navigation";
-import Loading from "./Loading";
-
+import { useRouter, usePathname } from "next/navigation";
 interface JobListProps {
 	jobs?: JobPost[];
 	onEdit?: (job: JobPost) => void;
@@ -16,16 +14,19 @@ interface JobListProps {
 }
 
 const JobList: React.FC<JobListProps> = ({ jobs, onEdit, onDelete }) => {
-	const { jobList, loading } = useJobs();
+	const { jobList } = useJobs();
 	const data = jobs || jobList;
 	const router = useRouter();
+	const pathname = usePathname();
+	const isDashboard = pathname.includes("dashboard");
 
-	if (loading)
+	if (!data || data.length === 0) {
 		return (
-			<div className="fixed inset-0 flex items-center justify-center bg-page bg-opacity-60 z-50">
-				<Loading />
+			<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center text-gray-400 text-lg font-semibold">
+				{isDashboard ? "No jobs created yet" : "No jobs available"}
 			</div>
 		);
+	}
 
 	return (
 		<>
