@@ -48,7 +48,11 @@ const NavBar = () => {
 			</label>
 			<RenderIf isTrue={!loading}>
 				<div className="md:flex gap-4 items-center hidden md:flex flex-col md:flex-row absolute md:static top-16 right-8 bg-[#202020] md:bg-transparent shadow-lg md:shadow-none rounded md:rounded-none p-6 md:p-0 z-40 w-48 md:w-auto peer-checked:flex">
-					<Link href="/" className="hover:text-blue-400 w-full md:w-auto text-center whitespace-nowrap text-white" onClick={closeMenu}>
+					<Link
+						href="/"
+						className="hover:text-blue-400 w-full md:w-auto text-center whitespace-nowrap text-white"
+						onClick={closeMenu}
+					>
 						Home
 					</Link>
 					<RenderIf isTrue={user !== null}>
