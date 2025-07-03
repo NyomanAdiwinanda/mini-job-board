@@ -99,23 +99,25 @@ const SearchBar = ({}) => {
 				{countriesFilter[0]?.id &&
 					selectedCountryId &&
 					(search || selectedCountryId !== countriesFilter[0].id || selectedLocation || selectedJobTypeId) && (
-						<button
-							onClick={() => {
-								setSearch("");
-								setSelectedCountryId(countriesFilter[0]?.id || "");
-								setSelectedLocation("");
-								setSelectedLocationFilter("");
-								setSearchFilter("");
-								setSelectedCountryFilter("");
-								setSelectedJobTypeId("");
-								setSelectedJobTypeFilter("");
-							}}
-							className="ml-2 px-4 py-2 rounded bg-gray-600 text-white font-semibold hover:bg-gray-700 transition border border-gray-600"
-							style={{ minWidth: 0 }}
-							type="button"
-						>
-							Reset Filters
-						</button>
+						<>
+							<button
+								onClick={() => {
+									setSearch("");
+									setSelectedCountryId(countriesFilter[0]?.id || "");
+									setSelectedLocation("");
+									setSelectedLocationFilter("");
+									setSearchFilter("");
+									setSelectedCountryFilter("");
+									setSelectedJobTypeId("");
+									setSelectedJobTypeFilter("");
+								}}
+								className="ml-2 px-4 py-2 rounded bg-gray-600 text-white font-semibold hover:bg-gray-700 transition border border-gray-600 hidden md:inline-block"
+								style={{ minWidth: 0 }}
+								type="button"
+							>
+								Reset Filters
+							</button>
+						</>
 					)}
 			</div>
 			<div className="block md:hidden mt-4">
@@ -190,11 +192,9 @@ const SearchBar = ({}) => {
 						}
 					>
 						<option value="">
-							{isLoadingCities
-								? "Loading..."
-								: locationList.length === 0
-								? "No cities for selected country"
-								: "Select location"}
+							{isLoadingCities && "Loading..."}
+							{!isLoadingCities && locationList.length === 0 && "No cities for selected country"}
+							{!isLoadingCities && locationList.length > 0 && "Select location"}
 						</option>
 						{locationList.map(city => (
 							<option key={city} value={city}>
@@ -228,6 +228,27 @@ const SearchBar = ({}) => {
 					</select>
 				</div>
 			</div>
+			{countriesFilter[0]?.id &&
+				selectedCountryId &&
+				(search || selectedCountryId !== countriesFilter[0].id || selectedLocation || selectedJobTypeId) && (
+					<button
+						onClick={() => {
+							setSearch("");
+							setSelectedCountryId(countriesFilter[0]?.id || "");
+							setSelectedLocation("");
+							setSelectedLocationFilter("");
+							setSearchFilter("");
+							setSelectedCountryFilter("");
+							setSelectedJobTypeId("");
+							setSelectedJobTypeFilter("");
+						}}
+						className="mt-4 w-full px-4 py-2 rounded bg-gray-600 text-white font-semibold hover:bg-gray-700 transition border border-gray-600 md:hidden"
+						style={{ minWidth: 0 }}
+						type="button"
+					>
+						Reset Filters
+					</button>
+				)}
 		</div>
 	);
 };
