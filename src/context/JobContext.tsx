@@ -1,10 +1,10 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { supabase } from "@/supabase/client";
 import { QueryError } from "@supabase/supabase-js";
 import { Country } from "@/entities/country";
 import { JobType } from "@/entities/job-type";
 import { JobPost } from "@/entities/job-post";
+import { JobService } from "@/services/JobService";
 
 interface JobContextType {
 	jobList: JobPost[];
@@ -42,36 +42,19 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const fetchAll = useCallback(async () => {
 		setLoading(true);
-
-		let query = supabase.from("job_posts").select("*, countries(id, name, iso), job_types(id, type)");
-
-		if (searchFilter) {
-			query = query.or(`title.ilike.%${searchFilter}%,company_name.ilike.%${searchFilter}%`);
-		}
-
-		if (selectedLocationFilter) {
-			query = query.eq("location", selectedLocationFilter);
-		}
-
-		if (selectedCountryFilter) {
-			query = query.eq("country_id", selectedCountryFilter);
-		}
-
-		if (selectedJobTypeFilter) {
-			query = query.eq("job_type_id", selectedJobTypeFilter);
-		}
-
-		query = query.order("updated_at", { ascending: false });
-
-		const [
-			{ data: jobListData, error: jobListError },
-			{ data: countriesFilterData, error: countryFilterError },
-			{ data: jobTypeFilterData, error: jobTypeFilterError },
-		] = await Promise.all([
-			query,
-			supabase.from("countries").select("*").order("sort_order", { ascending: true }),
-			supabase.from("job_types").select("*").order("created_at", { ascending: true }),
-		]);
+		const {
+			jobListData,
+			jobListError,
+			countriesFilterData,
+			countryFilterError,
+			jobTypeFilterData,
+			jobTypeFilterError,
+		} = await JobService.fetchAll({
+			searchFilter,
+			selectedLocationFilter,
+			selectedCountryFilter,
+			selectedJobTypeFilter,
+		});
 
 		if (jobListError || countryFilterError || jobTypeFilterError) {
 			setJobListError(jobListError || null);
@@ -80,9 +63,9 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
 			return;
 		}
 
-		setJobList(jobListData);
-		setCountriesFilter(countriesFilterData);
-		setJobTypeFilter(jobTypeFilterData);
+		setJobList(jobListData || []);
+		setCountriesFilter(countriesFilterData || []);
+		setJobTypeFilter(jobTypeFilterData || []);
 		setLoading(false);
 	}, [searchFilter, selectedLocationFilter, selectedCountryFilter, selectedJobTypeFilter]);
 
@@ -91,19 +74,11 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
 	}, [fetchAll]);
 
 	const fetchUserJobs = async (userId: string) => {
-		const { data, error } = await supabase
-			.from("job_posts")
-			.select("*, countries(id, name, iso), job_types(id, type)")
-			.eq("user_id", userId)
-			.order("updated_at", { ascending: false });
-		if (error) return [];
-
-		return data || [];
+		return await JobService.fetchUserJobs(userId);
 	};
 
 	const updateJob = async (id: string, updatedJob: Partial<JobPost>) => {
-		const { error } = await supabase.from("job_posts").update(updatedJob).eq("id", id);
-		if (error) throw error;
+		await JobService.updateJob(id, updatedJob);
 		await fetchAll();
 	};
 

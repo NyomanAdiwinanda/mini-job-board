@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
 import { AuthError } from "@supabase/supabase-js";
-import { supabase } from "@/supabase/client";
+import { AuthService } from "@/services/AuthService";
 
 interface AuthContextType {
 	user: User | null;
@@ -25,17 +25,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	}, []);
 
 	const getUser = async () => {
-		const { data } = await supabase.auth.getUser();
-		setUser(data?.user || null);
+		const user = await AuthService.getUser();
+		setUser(user);
 		setLoading(false);
 	};
 
 	const signIn = async (email: string, password: string) => {
-		const { data, error } = await supabase.auth.signInWithPassword({
-			email,
-			password,
-		});
-
+		const { data, error } = await AuthService.signIn(email, password);
 		if (error) {
 			setError(error as AuthError);
 		} else {
@@ -44,11 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const signUp = async (email: string, password: string) => {
-		const { data, error } = await supabase.auth.signUp({
-			email,
-			password,
-		});
-
+		const { data, error } = await AuthService.signUp(email, password);
 		if (error) {
 			setError(error as AuthError);
 		} else {
@@ -57,8 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const signOut = async () => {
-		const { error } = await supabase.auth.signOut();
-
+		const { error } = await AuthService.signOut();
 		if (error) {
 			setError(error as AuthError);
 		} else {
