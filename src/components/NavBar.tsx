@@ -10,7 +10,13 @@ const NavBar = () => {
 	const router = useRouter();
 	const { user, loading, signOut } = useAuth();
 
+	const closeMenu = () => {
+		const menuToggle = document.getElementById("menu-toggle") as HTMLInputElement;
+		if (menuToggle) menuToggle.checked = false;
+	};
+
 	const handleSignOut = () => {
+		closeMenu();
 		signOut();
 		router.push("/");
 		toast.warn("You have been signed out", {
@@ -42,19 +48,21 @@ const NavBar = () => {
 			</label>
 			<RenderIf isTrue={!loading}>
 				<div className="md:flex gap-4 items-center hidden md:flex flex-col md:flex-row absolute md:static top-16 right-8 bg-[#202020] md:bg-transparent shadow-lg md:shadow-none rounded md:rounded-none p-6 md:p-0 z-40 w-48 md:w-auto peer-checked:flex">
-					<Link href="/" className="hover:text-blue-400 w-full md:w-auto text-center whitespace-nowrap text-white">
+					<Link href="/" className="hover:text-blue-400 w-full md:w-auto text-center whitespace-nowrap text-white" onClick={closeMenu}>
 						Home
 					</Link>
 					<RenderIf isTrue={user !== null}>
 						<Link
 							href="/post-job"
 							className="hover:text-blue-400 w-full md:w-auto text-center whitespace-nowrap text-white"
+							onClick={closeMenu}
 						>
 							Post Job
 						</Link>
 						<Link
 							href="/dashboard"
 							className="hover:text-blue-400 w-full md:w-auto text-center whitespace-nowrap text-white"
+							onClick={closeMenu}
 						>
 							Dashboard
 						</Link>
@@ -69,12 +77,14 @@ const NavBar = () => {
 						<Link
 							href="/signin"
 							className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full md:w-auto text-center whitespace-nowrap"
+							onClick={closeMenu}
 						>
 							Sign In
 						</Link>
 						<Link
 							href="/signup"
 							className="border border-blue-400 text-blue-400 px-4 py-2 rounded hover:bg-blue-900 w-full md:w-auto text-center whitespace-nowrap"
+							onClick={closeMenu}
 						>
 							Sign Up
 						</Link>

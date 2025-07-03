@@ -24,7 +24,7 @@ const JobList: React.FC<JobListProps> = ({ jobs, onEdit, onDelete }) => {
 
 	if (!data || data.length === 0) {
 		return (
-			<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center text-gray-400 text-lg font-semibold">
+			<div className="absolute left-1/2 top-1/2 md:top-1/2 -translate-x-1/2 -translate-y-1/2 md:-translate-y-1/2 w-full text-center text-gray-400 text-lg font-semibold pt-40 md:pt-0">
 				{isDashboard ? "No jobs created yet" : "No jobs available"}
 			</div>
 		);
