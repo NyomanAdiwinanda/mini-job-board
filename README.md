@@ -6,7 +6,7 @@ A web application for posting, searching, and managing job listings with advance
 
 ## 🚀 Live Demo
 
-> _Replace this line with your deployed link if available._
+> [https://mini-job-board-murex.vercel.app/](https://mini-job-board-murex.vercel.app/)
 
 ---
 
@@ -34,12 +34,12 @@ A web application for posting, searching, and managing job listings with advance
 
 ---
 
-## 🛠️ Setup Instructions
+## 🛠️ Local Environment Setup Instructions
 
 1. **Clone the repository:**
 
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/NyomanAdiwinanda/mini-job-board
    cd mini-job-board
    ```
 
@@ -47,18 +47,20 @@ A web application for posting, searching, and managing job listings with advance
 
    ```bash
    npm install
-   # or yarn install
    ```
 
-3. **Configure Supabase:**
+3. **Configure .env:**
 
-   - Copy your Supabase project URL and anon key into `src/supabase/client.ts`.
-   - Ensure your Supabase tables: `job_posts`, `countries`, `job_types` are set up as per the entities in `src/entities/`.
+   Create a `.env.local` file in the root directory:
+
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your-project-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   ```
 
 4. **Run the development server:**
    ```bash
    npm run dev
-   # or yarn dev
    ```
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
