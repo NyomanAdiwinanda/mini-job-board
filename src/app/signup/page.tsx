@@ -21,7 +21,23 @@ const SignUpPage = () => {
 			return;
 		}
 
-		await signUp(email, password);
+		const error = await signUp(email, password);
+
+		if (error) {
+			toast.error("User already exist", {
+				position: "bottom-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: false,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "dark",
+				transition: Bounce,
+			});
+			return;
+		}
+
 		router.push("/");
 		toast.success("Sign up success", {
 			position: "bottom-right",

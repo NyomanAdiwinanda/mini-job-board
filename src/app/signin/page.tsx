@@ -9,13 +9,29 @@ const SignInPage = () => {
 	const router = useRouter();
 	const { signIn } = useAuth();
 
-	const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSignIn = async (e: React.FormEvent<HTMLFormElement>, resetFields: () => void) => {
 		e.preventDefault();
 		const form = e.target as HTMLFormElement;
 		const formData = new FormData(form);
 		const email = formData.get("email") as string;
 		const password = formData.get("password") as string;
-		await signIn(email, password);
+		const error = await signIn(email, password);
+
+		if (error) {
+			resetFields();
+			toast.error("User not found", {
+				position: "bottom-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: false,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "dark",
+				transition: Bounce,
+			});
+			return;
+		}
 
 		router.push("/");
 

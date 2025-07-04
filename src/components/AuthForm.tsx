@@ -5,7 +5,7 @@ import RenderIf from "@/utils/RenderIf";
 
 interface AuthFormProps {
 	type: "signin" | "signup";
-	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+	onSubmit: (e: React.FormEvent<HTMLFormElement>, resetFields: () => void) => void;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
@@ -23,12 +23,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
 
 	const isSignup = type === "signup";
 	const isDisabled = isSignup
-		? !email || !password || !confirmPassword || password !== confirmPassword
+		? !email || !password || !confirmPassword || password !== confirmPassword || password.length <= 5
 		: !email || !password;
+
+	const resetFields = () => {
+		setEmail("");
+		setPassword("");
+		setConfirmPassword("");
+	};
 
 	return (
 		<form
-			onSubmit={onSubmit}
+			onSubmit={e => onSubmit(e, resetFields)}
 			className="bg-card p-8 rounded shadow-md w-full max-w-md mx-auto flex flex-col gap-4 text-card"
 		>
 			<h1 className="text-2xl font-bold text-center mb-4">{type === "signin" ? "Sign In" : "Sign Up"}</h1>

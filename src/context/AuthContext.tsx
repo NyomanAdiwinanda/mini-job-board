@@ -7,17 +7,15 @@ import { AuthService } from "@/services/AuthService";
 interface AuthContextType {
 	user: User | null;
 	loading: boolean;
-	error: AuthError | null;
-	signIn: (email: string, password: string) => void;
-	signUp: (email: string, password: string) => void;
-	signOut: () => void;
+	signIn: (email: string, password: string) => Promise<AuthError | undefined>;
+	signUp: (email: string, password: string) => Promise<AuthError | undefined>;
+	signOut: () => Promise<AuthError | undefined>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
-	const [error, setError] = useState<AuthError | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -33,34 +31,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const signIn = async (email: string, password: string) => {
 		const { data, error } = await AuthService.signIn(email, password);
 		if (error) {
-			setError(error as AuthError);
+			return error;
 		} else {
 			setUser(data?.user || null);
+			return;
 		}
 	};
 
 	const signUp = async (email: string, password: string) => {
 		const { data, error } = await AuthService.signUp(email, password);
 		if (error) {
-			setError(error as AuthError);
+			return error;
 		} else {
 			setUser(data?.user || null);
+			return;
 		}
 	};
 
 	const signOut = async () => {
 		const { error } = await AuthService.signOut();
 		if (error) {
-			setError(error as AuthError);
+			return error;
 		} else {
 			setUser(null);
+			return;
 		}
 	};
 
 	const value = {
 		user,
 		loading,
-		error,
 		signIn,
 		signUp,
 		signOut,
